@@ -17,11 +17,8 @@ def browser(request):
     browser = None
     if browser_name == 'chrome':
         options = Options()
-        options.add_experimental_option \
-                (
-                'prefs',
-                {'intl.accept_languages': language}
-            )
+        options.add_experimental_option(
+                'prefs', {'intl.accept_languages': language})
         print('\nStar chrome browser.\n')
         driver = webdriver.Chrome(options=options)
     elif browser_name == 'firefox':
