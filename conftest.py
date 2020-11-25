@@ -21,6 +21,7 @@ def browser(request):
                 'prefs', {'intl.accept_languages': language})
         print('\nStar chrome browser.\n')
         driver = webdriver.Chrome(options=options)
+
     elif browser_name == 'firefox':
         fp = webdriver.FirefoxProfile()
         fp.set_preference('intl.accept_languages', language)
