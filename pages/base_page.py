@@ -10,7 +10,7 @@ class BasePage:
     def __init__(self, browser, url, timeout=10):
         self.browser = browser
         self.url = url
-        # self.browser.implicitly_wait(timeout)
+        #self.browser.implicitly_wait(timeout)
 
     def go_to_login_page(self):
         login_link = self.browser.find_element(
@@ -20,6 +20,10 @@ class BasePage:
     def go_to_cart_page(self):
         cart_button = self.browser.find_element(*BasePageLocators.CART_BUTTON)
         cart_button.click()
+
+    def should_be_authorized_user(self):
+        assert self.is_element_present(*BasePageLocators.USER_ICON), \
+            'User icon is not presented, probably user is not authorized'
 
     def should_be_login_link(self):
         assert self.is_element_present(*BasePageLocators.LOGIN_LINK), \

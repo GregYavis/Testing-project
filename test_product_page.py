@@ -1,8 +1,12 @@
-import pytest
+import time
 
+import pytest
+from pages.base_page import BasePage
 from pages.main_page import MainPage
 from pages.product_page import ProductPage
 from pages.basket_page import BasketPage
+from pages.login_page import LoginPage
+
 link = 'http://selenium1py.pythonanywhere.com/catalogue/coders-at' \
        '-work_207/?promo=offer{}'
 
@@ -65,6 +69,7 @@ def test_guest_can_go_to_login_page_from_product_page(browser):
     product_page.go_to_login_page()
 
 
+@pytest.mark.skip
 def test_guest_cant_see_product_in_basket_opened_from_product_page(browser):
     link = "http://selenium1py.pythonanywhere.com/en-gb/catalogue/the-city-and-the-stars_95/"
     product_page = ProductPage(browser, link)
@@ -72,3 +77,33 @@ def test_guest_cant_see_product_in_basket_opened_from_product_page(browser):
     product_page.go_to_cart_page()
     cart_page = BasketPage(browser, browser.current_url)
     cart_page.check_cart()
+
+
+@pytest.mark.registered_user
+class TestUserAddToBasketFromProductPage():
+    @pytest.fixture(scope='function', autouse=True)
+    def setup(self, browser):
+        link = "http://selenium1py.pythonanywhere.com/ru/accounts/login/"
+        #self.browser = browser
+        #self.browser.implicitly_wait(10)
+        page = LoginPage(browser, link)
+        page.open()
+        email = str(time.time()) + "@generate.com"
+        password = 'HalabudaDADAbuda'
+        page.register_new_user(email, password)
+        page.should_be_authorized_user()
+
+
+    def test_user_cant_see_success_message(self, browser):
+        link = f'http://selenium1py.pythonanywhere.com/catalogue/coders-at' \
+               f'-work_207/?promo=offer0'
+        product_page = ProductPage(browser, link)
+        product_page.open()
+        product_page.should_not_be_success_message()
+
+    def test_user_can_add_product_to_cart(self, browser):
+        link = f'http://selenium1py.pythonanywhere.com/catalogue/coders-at' \
+               f'-work_207/?promo=offer0'
+        product_page = ProductPage(browser, link)
+        product_page.open()
+        product_page.check_product_page()
