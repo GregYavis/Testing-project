@@ -1,12 +1,25 @@
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 import math
 from selenium.common.exceptions import NoAlertPresentException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+from .locators import BasePageLocators
+
 
 class BasePage:
     def __init__(self, browser, url, timeout=10):
         self.browser = browser
         self.url = url
-        self.browser.implicitly_wait(timeout)
+        # self.browser.implicitly_wait(timeout)
+
+    def go_to_login_page(self):
+        login_link = self.browser.find_element(
+            *BasePageLocators.LOGIN_LINK)
+        login_link.click()
+
+    def should_be_login_link(self):
+        assert self.is_element_present(*BasePageLocators.LOGIN_LINK), \
+            "Login link is not present"
 
     def open(self):
         self.browser.get(self.url)
@@ -16,6 +29,29 @@ class BasePage:
             self.browser.find_element(search_method, selector)
         except NoSuchElementException:
             return False
+        return True
+
+    def is_not_element_present(self, search_method, selector, timeout=4):
+        try:
+            WebDriverWait(self.browser, timeout).until(
+                expected_conditions.presence_of_element_located((
+                    search_method, selector
+                )))
+        except TimeoutException:
+            return True
+
+        return False
+
+    def element_disappeared(self, search_method, selector, timeout=4):
+        try:
+            WebDriverWait(self.browser, timeout).until_not(
+                expected_conditions.presence_of_element_located((
+                    search_method, selector
+                ))
+            )
+        except TimeoutException:
+            return False
+
         return True
 
     def solve_quiz_and_get_code(self):
